@@ -16,7 +16,8 @@ export const validarJwt = (req: Request, res: Response, next: NextFunction) => {
 
     try {
         //verificamos en jwt
-        Jwt.verify(token, process.env.SECRETOKEY as string)
+        let user: any = Jwt.verify(token, process.env.SECRETOKEY as string)
+        req.body.idUserAutenticado = user.uid
         next()
 
     } catch (error) {

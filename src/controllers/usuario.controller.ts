@@ -28,11 +28,41 @@ export const getUser = async (req: Request, res: Response): Promise<Response> =>
 
 }
 
+
+export const getDataUsuario = async (req: Request, res: Response): Promise<Response> => {
+
+    try {
+
+        const user = await getRepository(Usuario).findOne(req.body.idUserAutenticado);
+
+        if (!user) {
+            return res.status(400).json({
+                msg: 'El usuario no existe'
+            })
+        } else {
+            return res.status(200).json({
+                Usuario: {
+                    Id: user.Id,
+                    UserName: user.UserName
+                },
+            });
+        }
+
+
+    } catch (error) {
+        return res.status(500).json({
+            msg: "Ha ocurrido un error",
+            error
+        })
+    }
+
+}
+
 export const createUser = async (req: Request, res: Response): Promise<Response> => {
 
     try {
         console.log(req.body);
-        
+
         const user = await validateUserName(req.body)
 
 
