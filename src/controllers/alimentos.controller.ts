@@ -38,11 +38,11 @@ export const getAlimentoById = async (req: Request, res: Response): Promise<Resp
 
         const alimento = await getRepository(AlimentoUsuario).findOne(req.params.id);
 
-        if(!alimento){
+        if (!alimento) {
             return res.status(400).json({
                 msg: 'Registro no encontrado'
             })
-        }else{
+        } else {
             return res.status(200).json({
                 ...alimento
             });
@@ -116,7 +116,7 @@ export const updateAlimento = async (req: Request, res: Response): Promise<Respo
     try {
         console.log(req.body);
 
-        
+
         const alimento = await getRepository(AlimentoUsuario).findOne(req.body.Id)
 
         if (alimento) {
@@ -142,6 +142,62 @@ export const updateAlimento = async (req: Request, res: Response): Promise<Respo
     }
 
 }
+
+export const buscadorAlimentos = async (req: Request, res: Response): Promise<Response> => {
+    try {
+
+        const Id = req.body.idUserAutenticado
+        const page: number = parseInt(req.body.page as any) || 1;
+        const itemsByPage: number = 5;
+        const dataBuscador = req.body.campoBuscador
+
+        console.log(req.body);
+
+        console.log(dataBuscador);
+
+
+        const alimentos = await getRepository(AlimentoUsuario).createQueryBuilder("AlimentoUsuario")
+            .innerJoin("AlimentoUsuario.Usuario", "usuario")
+           // .where("usuario.Id = :Id", { Id: Id })
+            .where(`
+             (usuario.Id = :Id) &&
+             (AlimentoUsuario.Desayuno  like :Desayuno
+             OR AlimentoUsuario.Comida like :Comida
+             OR AlimentoUsuario.Cena like :Cena
+             OR AlimentoUsuario.Merienda like :Merienda
+             OR AlimentoUsuario.ComidaExtra like :ComidaExtra)
+             `,
+                {
+                    Id: Id,
+                    Desayuno: `%${dataBuscador}%`,
+                    Comida: `%${dataBuscador}%`,
+                    Cena: `%${dataBuscador}%`,
+                    Merienda: `%${dataBuscador}%`,
+                    ComidaExtra: `%${dataBuscador}%`,
+                })
+            .offset((page - 1) * itemsByPage).limit(itemsByPage).orderBy("AlimentoUsuario.FechaCreacion", "DESC")
+
+        const total = await alimentos.getCount()
+
+        return res.status(200).json({
+            data: await alimentos.getMany(),
+            page,
+            itemsByPage,
+            total
+        })
+
+
+    } catch (error) {
+        return res.status(500).json({
+            msg: "Ha ocurrido un error",
+            error
+        })
+    }
+}
+
+
+
+
 
 export const getAlimentosByIdUser = async (req: Request, res: Response): Promise<Response> => {
 

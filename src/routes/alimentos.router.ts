@@ -11,6 +11,7 @@ router.get('/GetAlimentoById/:id', [validarJwt], alimentosController.getAlimento
 router.post('/Save', [validarJwt], alimentosController.saveAlimentos)
 router.put('/Update', [validarJwt], alimentosController.updateAlimento)
 router.delete('/Delete/:id', [validarJwt], alimentosController.deleteAlimento)
+router.post('/BuscadorPaginacion', [validarJwt], alimentosController.buscadorAlimentos)
 
 
 
