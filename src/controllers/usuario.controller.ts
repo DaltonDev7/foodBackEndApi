@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import { getRepository } from "typeorm"
 import { Usuario } from "../entity/Usuario"
-import { encriptarPassword, validateUserName } from '../handlers/usuario.handlers';
+import { encriptarPassword, validateUserName, validatePassword } from '../handlers/usuario.handlers';
 
 
 export const Saludo = (req: Request, res: Response) => {
@@ -61,7 +61,7 @@ export const getDataUsuario = async (req: Request, res: Response): Promise<Respo
 export const createUser = async (req: Request, res: Response): Promise<Response> => {
 
     try {
-        console.log(req.body);
+
 
         const user = await validateUserName(req.body)
 
@@ -92,24 +92,74 @@ export const createUser = async (req: Request, res: Response): Promise<Response>
 
 }
 
+export const updatePassWordUser = async (req: Request, res: Response): Promise<Response> => {
+
+    try {
+        const user = await getRepository(Usuario).findOne(req.body.idUserAutenticado);
+
+        if (!user) {
+            return res.status(400).json({
+                msg: 'Este usuario no existe',
+            })
+        } else {
+            const validPass = validatePassword(req.body.PassWordActual, user)
+
+            if (!validPass) {
+                return res.status(400).json({
+                    msg: 'La contraseña actual es incorrecta',
+                })
+            } else {
+                await encriptarPassword(req.body)
+                let userUpdate = await getRepository(Usuario).merge(user, req.body)
+                await getRepository(Usuario).save(userUpdate)
+
+                return res.status(201).json({
+                    msg: 'Contraseña actualizada',
+                })
+            }
+        }
+
+
+
+
+    } catch (error) {
+        return res.status(500).json({
+            msg: "Ha ocurrido un error",
+            error
+        })
+    }
+}
+
+
 
 export const updateUser = async (req: Request, res: Response): Promise<Response> => {
 
     try {
 
-        const user = await getRepository(Usuario).findOne(req.body.Id)
 
-        if (user) {
-            await getRepository(Usuario).merge(user, req.body)
-            await getRepository(Usuario).save(user)
-            return res.json({
-                msg: 'Actualizado'
+        const userExist = await validateUserName(req.body)
+
+        if (userExist) {
+            return res.status(400).json({
+                msg: 'Este UserName ya existe',
+            })
+        } else {
+            const user = await getRepository(Usuario).findOne(req.body.Id)
+
+
+            if (user) {
+                let userUpdate = await getRepository(Usuario).merge(user, req.body)
+                await getRepository(Usuario).save(userUpdate)
+                return res.json({
+                    msg: 'Actualizado'
+                })
+            }
+
+            return res.status(404).json({
+                msg: 'Usuario no encontrado'
             })
         }
 
-        return res.status(404).json({
-            msg: 'Usuario no encontrado'
-        })
 
     } catch (error) {
         return res.status(500).json({

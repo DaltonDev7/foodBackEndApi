@@ -1,23 +1,52 @@
 import { Request, Response } from "express"
 import { getRepository } from "typeorm"
 import { AlimentoUsuario } from '../entity/AlimentosUsuario';
+import { Usuario } from '../entity/Usuario';
 
 export const saveAlimentos = async (req: Request, res: Response): Promise<Response> => {
 
     try {
+        //console.log(req.body);
 
         const newAlimentoUser = await getRepository(AlimentoUsuario).create(req.body)
 
         let format = {
             ...newAlimentoUser,
-            FechaCreacion: new Date()
+            FechaCreacion: new Date(),
+            IdUsuario: req.body.IdUsuario
         }
+
         const result = await getRepository(AlimentoUsuario).save(format)
 
         return res.status(201).json({
             msg: 'Registro Creado',
             result
         })
+
+    } catch (error) {
+        return res.status(500).json({
+            msg: "Ha ocurrido un error",
+            error
+        })
+    }
+
+}
+export const getAlimentoById = async (req: Request, res: Response): Promise<Response> => {
+
+
+    try {
+
+        const alimento = await getRepository(AlimentoUsuario).findOne(req.params.id);
+
+        if(!alimento){
+            return res.status(400).json({
+                msg: 'Registro no encontrado'
+            })
+        }else{
+            return res.status(200).json({
+                ...alimento
+            });
+        }
 
     } catch (error) {
         return res.status(500).json({
@@ -85,7 +114,9 @@ export const getAlimentos = async (req: Request, res: Response): Promise<Respons
 export const updateAlimento = async (req: Request, res: Response): Promise<Response> => {
 
     try {
+        console.log(req.body);
 
+        
         const alimento = await getRepository(AlimentoUsuario).findOne(req.body.Id)
 
         if (alimento) {
@@ -115,11 +146,12 @@ export const updateAlimento = async (req: Request, res: Response): Promise<Respo
 export const getAlimentosByIdUser = async (req: Request, res: Response): Promise<Response> => {
 
     try {
-        const Id = req.params.id.toString()
+        //const Id = req.params.id.toString()
+        const Id = req.body.idUserAutenticado
 
-
-        const page: number = parseInt(req.query.page as any) || 1;
+        const page: number = parseInt(req.body.page as any) || 1;
         const itemsByPage: number = 5;
+        console.log(req.body);
 
 
         const alimentos = await getRepository(AlimentoUsuario).createQueryBuilder("AlimentoUsuario")

@@ -9,6 +9,7 @@ router.get('/Get', usuarioController.getUser)
 router.get('/GetDataUser', [validarJwt], usuarioController.getDataUsuario)
 router.post('/Save', usuarioController.createUser)
 router.put('/Update', [validarJwt], usuarioController.updateUser)
+router.post('/UpdatePassword', [validarJwt], usuarioController.updatePassWordUser)
 
 
 
