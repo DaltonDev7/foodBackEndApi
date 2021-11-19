@@ -1,19 +1,40 @@
-{
-   "type": "mysql",
-   "host": "localhost",
-   "port": 3306,
-   "username": "root",
-   "password": "root",
-   "database": "crudcomidadb",
-   "synchronize": false,
-   "entities": [
-      "dist/entity/**/*.js"
-   ],
-   "migrations": [
-      "dist/migration/**/*.js"
-   ],
-   "cli": {
-      "entitiesDir": "src/entity",
-      "migrationsDir": "src/migration"
-  }
-}
+[
+   {
+      "type": "mysql",
+      "host": "localhost",
+      "port": 3306,
+      "username": "root",
+      "password": "root",
+      "database": "crudcomidadb",
+      "synchronize": false,
+      "entities": [
+         "dist/entity/**/*.js"
+      ],
+      "migrations": [
+         "dist/migration/**/*.js"
+      ],
+      "cli": {
+         "entitiesDir": "src/entity",
+         "migrationsDir": "src/migration"
+     }
+   },
+   {
+      "type": "postgres",
+      "host": "ec2-54-146-116-84.compute-1.amazonaws.com",
+      "port": 5432,
+      "username": "vktjgvvkyzanag",
+      "password": "247ff9f7807eeb22cf4a0b676a4d164457a6da1075eb9b13a504798c2801146e",
+      "database": "dcg663h3ba9mli",
+      "synchronize": false,
+      "entities": [
+         "dist/entity/**/*.js"
+      ],
+      "migrations": [
+         "dist/migration/**/*.js"
+      ],
+      "cli": {
+         "entitiesDir": "src/entity",
+         "migrationsDir": "src/migration"
+     }
+   }
+]
